@@ -34,6 +34,35 @@ experience, projects, skills, interests, about, contact, education. Both the
 desktop windows and the terminal render from it, so editing a value there updates
 both views. To change résumé text, edit `resume` and refresh.
 
+## Architecture
+
+Everything in `app.js` runs inside one IIFE (nothing leaks to global scope), in
+sections: **CONTENT** (the `resume` object) → **DESKTOP WINDOW RENDER** → **WINDOW
+MANAGER** → **SNAKE** → **TERMINAL**.
+
+- **One data source, two renderers.** `resume` is the single source of truth. The
+  desktop fills each window body's `innerHTML` from it (`byId("b-*")`); the terminal
+  prints the same data via `printAbout/printExperience/...`. All user strings pass
+  through `escapeHtml`; bare URLs go through `linkifyUrls`.
+- **Two modes.** A graphical desktop and a fullscreen terminal overlay. `showTerminal()`
+  / `launchDesktop()` swap between them (`.desktop.term-on`).
+- **Window manager.** Each section is a `.win`; it's a *single-page* desktop —
+  `openWindow(id)` closes any other open window, centers + focuses it, and (usually)
+  adds a taskbar button. `topZIndex` climbs on focus so the active window stacks on top.
+  Title bars are draggable on desktop (disabled on mobile, where windows are full-screen).
+- **Launchers are declarative.** Any element with `data-win="w-*"` is auto-wired to open
+  that window (desktop icons, Start-menu items, the bottom-bar buttons). Terminal is a
+  mode, not a window, so its launchers (`#mi-term`, `#tb-term`) call `showTerminal()`
+  directly.
+- **Blog** is an XP-styled *file browser* (`#w-blog`, `.xp` class → blue title bar,
+  menu/address bar, blue task pane). Each post tile opens the **reusable** post window
+  (`#w-post`) — one window, retitled per post. Blog + post windows **hide the bottom bar**
+  (`.desktop.bar-hidden`) and get **no** taskbar button; minimizing a post returns to the
+  blog window. When `resume.blog` is empty, the browser shows an XP "Posts coming soon"
+  loading bar.
+- **Snake** is a self-contained module exposing only `{ready, stop}` for the window
+  manager to init/teardown.
+
 ## Fonts
 
 Two typefaces, both free under the SIL Open Font License, loaded from `fonts/` as

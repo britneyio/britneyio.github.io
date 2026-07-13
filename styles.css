@@ -166,6 +166,44 @@ button,a,.icon,.task,.start,.cmdbtn,.mi{touch-action:manipulation;-webkit-tap-hi
 
 .skill-grp{margin-bottom:14px;}
 .skill-grp h3{font-family:'PressStart',monospace;font-size:9px;color:var(--green);margin:0 0 8px;text-transform:uppercase;}
+/* Blog "file browser": each post is a file tile that opens a post window. */
+.fb{display:flex;flex-direction:column;gap:8px;}
+.fb-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;box-shadow:3px 3px 0 var(--pink);padding:11px 12px;cursor:pointer;font:inherit;color:var(--ink);border:2px solid transparent;}
+.fb-item:hover{background:var(--pink-soft);}
+.fb-item:focus-visible{outline:3px solid var(--pink-deep);outline-offset:2px;}
+.fb-item .ico{width:26px;height:26px;image-rendering:pixelated;flex:none;}
+.fb-text{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.fb-name{font-size:19px;color:var(--ink);}
+.fb-prev{font-size:15px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fb-date{font-family:'PressStart',monospace;font-size:8px;color:var(--ink-soft);white-space:nowrap;flex:none;}
+.post-body{font-size:20px;color:var(--ink);margin-top:6px;}
+
+/* ----- XP-style file window (Blog + post), themed to the site palette ----- */
+#w-blog .win__body{padding:0;background:var(--face);border-top:none;}
+.xp-menu{display:flex;gap:16px;padding:4px 12px;background:var(--face);font-size:16px;color:var(--ink);border-bottom:2px solid var(--line);}
+.xp-addr{display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--face);border-bottom:2px solid var(--line);font-size:15px;color:var(--ink-soft);}
+.xp-addr-lbl{color:var(--ink-soft);}
+.xp-addr-box{flex:1;display:flex;align-items:center;gap:6px;background:#fff6fb;border:2px solid;border-top-color:var(--face-lo);border-left-color:var(--face-lo);border-right-color:var(--face-hi);border-bottom-color:var(--face-hi);padding:3px 8px;color:var(--ink);}
+.xp-cols{display:flex;align-items:stretch;min-height:200px;}
+.xp-pane{width:170px;flex:none;padding:14px 12px;background:linear-gradient(180deg,var(--pink-soft),var(--pink));border-right:2px solid var(--line);}
+.xp-pane h3{font-family:'PressStart',monospace;font-size:8px;color:var(--pink-deep);margin:0 0 10px;line-height:1.6;}
+.xp-pane p{font-size:15px;color:var(--ink);margin:0 0 8px;}
+.xp-pane .xp-tip{color:var(--ink-soft);}
+.xp-cols .fb{flex:1;min-width:0;padding:10px;gap:2px;background:#fff6fb;}
+.xp-cols .fb-item{box-shadow:none;background:transparent;padding:6px 8px;gap:10px;border:1px solid transparent;}
+.xp-cols .fb-item:hover{background:var(--pink-soft);border-color:var(--pink-deep);}
+.xp-cols .fb-name{color:var(--ink);}
+.xp-cols .fb-prev{color:var(--ink-soft);}
+.xp-cols .fb-date{color:var(--ink-soft);}
+/* "Please wait" scrolling loader shown when there are no posts yet. */
+.xp-loading{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#fff6fb;padding:40px 20px;}
+.xp-loading p{font-size:19px;color:var(--ink);margin:0;}
+.xp-load-bar{position:relative;width:132px;height:15px;background:var(--frame);border:1px solid var(--ink);border-radius:8px;overflow:hidden;}
+.xp-load-bar span{position:absolute;top:2px;width:12px;height:11px;border-radius:2px;background:linear-gradient(180deg,var(--green-led),var(--green));animation:xpslide 1.7s linear infinite;}
+.xp-load-bar span:nth-child(2){animation-delay:.2s;}
+.xp-load-bar span:nth-child(3){animation-delay:.4s;}
+@keyframes xpslide{0%{left:-26px;}100%{left:140px;}}
+@media (prefers-reduced-motion:reduce){.xp-load-bar span{animation:none;left:8px;}.xp-load-bar span:nth-child(2){left:26px;}.xp-load-bar span:nth-child(3){left:44px;}}
 .badges{display:flex;flex-wrap:wrap;gap:8px;}
 .badge{font-family:'PressStart',monospace;font-size:9px;color:var(--ink);background:#fff;padding:9px 10px;box-shadow:3px 3px 0 var(--pink);}
 .badge:nth-child(2n){box-shadow:3px 3px 0 var(--green-led);}
@@ -183,6 +221,9 @@ button,a,.icon,.task,.start,.cmdbtn,.mi{touch-action:manipulation;-webkit-tap-hi
 .taskbar{position:absolute;left:0;right:0;bottom:0;z-index:70;display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--face);border-top:3px solid var(--face-hi);}
 .start{display:flex;align-items:center;gap:8px;background:var(--pink);font-family:'PressStart',monospace;font-size:10px;color:var(--ink);padding:8px 12px;cursor:pointer;}
 .start .sq{width:11px;height:11px;background:var(--frame);}
+.tb-btn{display:flex;align-items:center;gap:7px;background:var(--face);font-family:'PressStart',monospace;font-size:8px;color:var(--ink);padding:7px 10px;cursor:pointer;}
+.tb-btn .ico{width:15px;height:15px;image-rendering:pixelated;}
+.tb-btn:hover{background:var(--pink-soft);}
 .tasks{display:flex;gap:6px;flex:1;overflow:hidden;}
 .task{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--face);font-family:'PressStart',monospace;font-size:8px;color:var(--ink-soft);padding:8px 10px;cursor:pointer;}
 .task.on{color:var(--ink);border-top-color:var(--face-lo);border-left-color:var(--face-lo);border-right-color:var(--face-hi);border-bottom-color:var(--face-hi);background:var(--pink-soft);}
@@ -201,7 +242,7 @@ button,a,.icon,.task,.start,.cmdbtn,.mi{touch-action:manipulation;-webkit-tap-hi
 /* ===== TERMINAL (green, black text) on pink screen ===== */
 #terminal{position:absolute;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:22px;background:transparent;}
 #terminal.off{display:none;}
-.desktop.term-on .taskbar{display:none;}
+.desktop.term-on .taskbar,.desktop.bar-hidden .taskbar{display:none;}
 #term-window{width:min(720px,100%);height:min(86%,600px);display:flex;flex-direction:column;background:var(--term-bg);border:3px solid var(--term-ink);box-shadow:8px 8px 0 rgba(0,0,0,.45);overflow:hidden;}
 #term-bar{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--term-bar);border-bottom:2px solid var(--term-ink);}
 #term-bar .tt{font-family:'PressStart',monospace;font-size:10px;color:var(--term-ink);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}

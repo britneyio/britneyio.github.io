@@ -64,7 +64,10 @@
       "Frameworks & Tools":["React","Django","REST APIs","Git","ROS","Data Visualization"],
       "Strengths":["Innovation","Collaboration","Adaptability","Critical Thinking"]
     },
-    interests:["Webtoon","Drums","Rock Climbing"]
+    interests:["Webtoon","Drums","Rock Climbing"],
+    // Add posts as {title, date, iso, body}; sorted newest-first by `iso`.
+    // Empty = the "Posts coming soon" loading screen shows.
+    blog:[]
   };
 
   /* ---------------- DESKTOP WINDOW RENDER ----------------
@@ -105,6 +108,32 @@
 
   byId("b-int").innerHTML='<h2>Interests</h2><div class="badges">'+resume.interests.map(function(i){return '<span class="badge">'+escapeHtml(i)+'</span>';}).join('')+'</div>';
 
+  // Blog "file browser": posts sorted newest-first, each a file tile that
+  // opens the reusable post window (#w-post) with the full entry.
+  var blogPosts=resume.blog.slice().sort(function(a,b){return a.iso<b.iso?1:a.iso>b.iso?-1:0;});
+  function blogPreview(s){var w=String(s).split(/\s+/);return w.slice(0,10).join(" ")+(w.length>10?"…":"");}
+  var blogTiles=blogPosts.map(function(p,i){
+    return '<button class="fb-item" data-post="'+i+'"><svg class="ico" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="4" y="3" width="14" height="18" fill="#ffb3d9" stroke="#3a2231" stroke-width="1.6"/><rect x="7" y="7" width="8" height="1.6" fill="#3a2231"/><rect x="7" y="11" width="8" height="1.6" fill="#3a2231"/><rect x="7" y="15" width="5" height="1.6" fill="#3a2231"/></svg><span class="fb-text"><span class="fb-name">'+escapeHtml(p.title)+'</span><span class="fb-prev">'+escapeHtml(blogPreview(p.body))+'</span></span><span class="fb-date">'+escapeHtml(p.date)+'</span></button>';
+  }).join('');
+  byId("b-blog").innerHTML=
+    '<div class="xp-menu"><span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Help</span></div>'+
+    '<div class="xp-addr"><span class="xp-addr-lbl">Address</span><span class="xp-addr-box">&#128193; C:\\Blog</span></div>'+
+    '<div class="xp-cols">'+
+      '<aside class="xp-pane"><h3>File and Folder Tasks</h3><p>'+blogPosts.length+' blog posts</p><p class="xp-tip">'+(blogPosts.length?'Click a post to open it.':'Check back soon.')+'</p></aside>'+
+      (blogPosts.length
+        ? '<div class="fb">'+blogTiles+'</div>'
+        : '<div class="xp-loading"><div class="xp-load-bar"><span></span><span></span><span></span></div><p>Posts coming soon…</p></div>')+
+    '</div>';
+  byId("b-blog").querySelectorAll(".fb-item").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var p=blogPosts[+btn.dataset.post];
+      byId("t-post").textContent=p.title;
+      byId("w-post").dataset.title=p.title;
+      byId("b-post").innerHTML='<h2>'+escapeHtml(p.title)+'</h2><p class="date">'+escapeHtml(p.date)+'</p><div class="post-body">'+linkifyUrls(p.body)+'</div>';
+      openWindow("w-post");
+    });
+  });
+
   /* ---------------- WINDOW MANAGER ----------------
      Fake OS windowing: each .win is a section; a matching button in the
      taskbar tracks it. topZIndex climbs so the focused window sits on top.
@@ -130,12 +159,14 @@
       win.style.left=Math.round(Math.max(margin,(d.width-win.offsetWidth)/2))+"px";
       win.style.top="24px";
     }
-    if(!taskButtonFor(id)){var b=document.createElement("button");b.className="task out";b.dataset.win=id;b.textContent=win.dataset.title;
+    // Blog + post windows hide the bottom bar, so they get no taskbar button.
+    if(id!=="w-blog"&&id!=="w-post"&&!taskButtonFor(id)){var b=document.createElement("button");b.className="task out";b.dataset.win=id;b.textContent=win.dataset.title;
       b.addEventListener("click",function(){if(win.hidden){win.hidden=false;focusWindow(win);}else if(win.classList.contains("active")){win.hidden=true;b.classList.remove("on");}else focusWindow(win);});
       tasks.appendChild(b);}
     focusWindow(win); if(id==="w-games") Snake.ready();
+    desktop.classList.toggle("bar-hidden", id==="w-blog"||id==="w-post");  // blog hides the bottom bar
   }
-  function closeWindow(win){win.hidden=true;var t=taskButtonFor(win.id);if(t)t.remove();if(win.id==="w-games")Snake.stop();}
+  function closeWindow(win){win.hidden=true;var t=taskButtonFor(win.id);if(t)t.remove();if(win.id==="w-games")Snake.stop();desktop.classList.remove("bar-hidden");}
 
   // When the terminal is open, a desktop-icon click scrolls to the matching
   // terminal section instead of opening a window. This maps window id -> section id.
@@ -156,7 +187,7 @@
   document.querySelectorAll(".win").forEach(function(win){
     win.addEventListener("pointerdown",function(){focusWindow(win);},true);
     win.querySelector(".cl").addEventListener("click",function(e){e.stopPropagation();closeWindow(win);});
-    win.querySelector(".mn").addEventListener("click",function(e){e.stopPropagation();win.hidden=true;var t=taskButtonFor(win.id);if(t)t.classList.remove("on");});
+    win.querySelector(".mn").addEventListener("click",function(e){e.stopPropagation();win.hidden=true;var t=taskButtonFor(win.id);if(t)t.classList.remove("on");desktop.classList.remove("bar-hidden");if(win.id==="w-post")openWindow("w-blog");});
     // Drag the window by its title bar (pointer events cover mouse + touch;
     // dragging is disabled on mobile, where windows are full-screen).
     var bar=win.querySelector(".win__bar"),dragging=false,offsetX=0,offsetY=0;
@@ -184,10 +215,10 @@
   var terminal=byId("terminal");
   function showTerminal(){document.querySelectorAll(".win").forEach(function(win){if(!win.hidden){win.hidden=true;var t=taskButtonFor(win.id);if(t)t.remove();if(win.id==="w-games")Snake.stop();}});terminal.classList.remove("off");desktop.classList.add("term-on");hideStartMenu();startBoot();}
   function launchDesktop(){terminal.classList.add("off");desktop.classList.remove("term-on");document.querySelectorAll(".icon").forEach(function(i){i.classList.remove("sel");});}
-  byId("term-icon").addEventListener("click",showTerminal);
   byId("mi-term").addEventListener("click",function(){showTerminal();});
   byId("term-exit").addEventListener("click",launchDesktop);
   byId("startpc").addEventListener("click",showTerminal);
+  byId("tb-term").addEventListener("click",showTerminal);
   byId("contactpc").addEventListener("click",function(){showTerminal();(function reach(){if(byId("sec-contact"))scrollToSection("sec-contact");else setTimeout(reach,120);})();});
 
   /* ---------------- SNAKE ----------------
