@@ -27,11 +27,10 @@
     },
     summary:{
       now:"Software Development Engineer at Amazon, building real-time systems that keep 100+ fulfillment centers running.",
-      going:"Going deeper into large-scale, real-time distributed systems and working directly with the people who use them turning messy, high-stakes problems into software that ships and holds up."
+      going: "I enjoy building software that solves real problems, and I like to focus on mission driven work that has a tangible impact on people's lives."
     },
     about:[
-      "I'm a software engineer who likes building systems that hold up under real-world load. At Amazon I work on real-time workforce optimization across the fulfillment network; before that I built analytics and fintech products at a startup, and trained machine-learning models for biomedical research.",
-      "I care about reliability, clear ownership, and shipping things people actually use. I move comfortably between backend pipelines, cloud infrastructure, and the occasional research problem."
+      "At Amazon I work on real-time workforce optimization across the fulfillment network; before that I built analytics and financial education products at a startup, and trained machine-learning models for biomedical research.",
     ],
     education:{degree:"B.S. in Computer Science", school:"Northeastern University", date:"May 2025"},
     experience:[
@@ -54,8 +53,10 @@
       ]}
     ],
     projects:[
-      {name:"RL Agent for IoT Security", date:"Jan 2025 — May 2025", desc:"Engineered a safe reinforcement-learning agent using deep Q-learning (DQN) and Soft Actor-Critic (SAC) to explore simulated dynamic smart-home network environments within safety constraints.", tags:["Python","DQN","SAC","Safe RL"]},
-      {name:"Closet Project", date:"Jan 2022 — Jan 2023", desc:"Built a wardrobe-management web app with Python and React over a RESTful API backend, using PostgreSQL for storage, with dynamic item tracking and outfit planning.", tags:["Python","React","PostgreSQL","REST"]}
+      {name:"OFF RAG Assistant", date:"2026 — Present", desc:"A retrieval-augmented-generation assistant over the Open Food Facts wiki: it ingests and normalizes MediaWiki content, chunks and embeds it, retrieves the top-k passages by cosine similarity, and generates answers grounded in — and citing — the source, refusing when the evidence is insufficient. Retrieval is measured with recall@k and generation with citation accuracy against a hand-built gold set.", tags:["Python","RAG","BGE-M3","Chroma","Claude API"]},
+      {name:"RL Agent for IoT Security", date:"Jan 2025 — May 2025", desc:"Engineered a safe reinforcement-learning agent using deep Q-learning (DQN) and Soft Actor-Critic (SAC) to explore simulated dynamic smart-home network environments within safety constraints.", tags:["Python","DQN","SAC","Safe RL"], links:[{label:"GitHub",url:"https://github.com/britneyio/SafeRL-for-IoT"}]},
+      {name:"Bipolar Biomarkers SVM", date:"Sep 2023 — Aug 2024", desc:"Developed a Support Vector Machine model in Python to identify blood biomarkers for mental-disorder diagnosis and classification, reaching 92% classification accuracy. Contributed to literature review, study design, and data analysis, and published a peer-reviewed paper in an IEEE journal (presented at MIT URTC).", tags:["Python","SVM","Machine Learning","Research"], links:[{label:"GitHub",url:"https://github.com/britneyio/Bipolar-Biomarkers-SVM"},{label:"IEEE Paper",url:"https://ieeexplore.ieee.org/document/10937586"}]},
+      {name:"Closet Project", date:"Jan 2022 — Jan 2023", desc:"Built a wardrobe-management web app with Python and React over a RESTful API backend, using PostgreSQL for storage, with dynamic item tracking and outfit planning.", tags:["Python","React","PostgreSQL","REST"], links:[{label:"GitHub",url:"https://github.com/britneyio/the-closet-project"}]}
     ],
     skills:{
       "Cloud & Infra":["AWS","AWS CDK","AWS AppConfig","Google Cloud","Docker","Heroku","Linux"],
@@ -81,8 +82,7 @@
   byId("b-about").innerHTML=
     '<h2>About Me</h2>'+
     '<p class="tag-lead">'+escapeHtml(resume.name)+' &middot; '+escapeHtml(resume.role)+'</p>'+
-    '<p><b>Now &mdash;</b> '+escapeHtml(resume.summary.now)+'</p>'+
-    '<p><b>Where I\'m going &mdash;</b> '+escapeHtml(resume.summary.going)+'</p>'+
+    '<p>'+escapeHtml(resume.summary.now)+' '+escapeHtml(resume.summary.going)+'</p>'+
     resume.about.map(function(p){return '<p>'+escapeHtml(p)+'</p>';}).join('')+
     '<p class="tag-lead">Education</p><p>'+escapeHtml(resume.education.degree)+' &mdash; '+escapeHtml(resume.education.school)+' &middot; '+escapeHtml(resume.education.date)+'</p>';
 
@@ -92,7 +92,9 @@
   }).join('')+'</ul>';
 
   byId("b-proj").innerHTML='<h2>Projects</h2><div class="pj">'+resume.projects.map(function(p){
-    return '<article><h3>'+escapeHtml(p.name)+'</h3><p class="date">'+escapeHtml(p.date)+'</p><p>'+escapeHtml(p.desc)+'</p><div class="tags">'+
+    return '<article><h3>'+escapeHtml(p.name)+'</h3><p class="date">'+escapeHtml(p.date)+'</p><p>'+escapeHtml(p.desc)+'</p>'+
+      (p.links?'<p class="links">'+p.links.map(function(l){return '<a href="'+encodeURI(l.url)+'" target="_blank" rel="noopener">'+escapeHtml(l.label)+' ↗</a>';}).join(' &middot; ')+'</p>':'')+
+      '<div class="tags">'+
       p.tags.map(function(t){return '<span class="tag">'+escapeHtml(t)+'</span>';}).join('')+'</div></article>';
   }).join('')+'</div>';
 
@@ -186,6 +188,7 @@
   byId("mi-term").addEventListener("click",function(){showTerminal();});
   byId("term-exit").addEventListener("click",launchDesktop);
   byId("startpc").addEventListener("click",showTerminal);
+  byId("contactpc").addEventListener("click",function(){showTerminal();(function reach(){if(byId("sec-contact"))scrollToSection("sec-contact");else setTimeout(reach,120);})();});
 
   /* ---------------- SNAKE ----------------
      A self-contained mini-game on a 15x15 grid drawn to a <canvas>. Exposes
@@ -220,9 +223,9 @@
   function printHeader(t,id){var d=printHtml(escapeHtml(t),"h");if(id)d.id=id;d.setAttribute("role","heading");d.setAttribute("aria-level","2");return d;}
   function scrollTerminalToBottom(){termScroll.scrollTop=termScroll.scrollHeight;}
 
-  function printAbout(){printHeader("ABOUT","sec-about");var bn=printHtml(escapeHtml(resume.name),"bigname");bn.setAttribute("role","heading");bn.setAttribute("aria-level","1");printLine(resume.role,"sub");printHtml("<b>Now:</b> "+escapeHtml(resume.summary.now),"k");printHtml("<b>Where I'm going:</b> "+escapeHtml(resume.summary.going),"k");printLine("");resume.about.forEach(function(p){printLine(p);printLine("");});printLine("Education: "+resume.education.degree+" — "+resume.education.school+" · "+resume.education.date,"k");}
+  function printAbout(){printHeader("ABOUT","sec-about");var bn=printHtml(escapeHtml(resume.name),"bigname");bn.setAttribute("role","heading");bn.setAttribute("aria-level","1");printLine(resume.role,"sub");printHtml(escapeHtml(resume.summary.now)+" "+escapeHtml(resume.summary.going),"k");printLine("");resume.about.forEach(function(p){printLine(p);printLine("");});printHtml("<b>Education:</b> "+escapeHtml(resume.education.degree)+" — "+escapeHtml(resume.education.school)+" · "+escapeHtml(resume.education.date),"k");}
   function printExperience(){printHeader("EXPERIENCE","sec-exp");resume.experience.forEach(function(x){printHtml("<b>"+escapeHtml(x.role)+"</b>","k");printLine(x.co+"  |  "+x.yr,"sub");x.points.forEach(function(p){printHtml("- "+linkifyUrls(p),"b");});printLine("");});}
-  function printProjects(){printHeader("PROJECTS","sec-proj");resume.projects.forEach(function(p){printHtml("<b>"+escapeHtml(p.name)+"</b>","k");printLine(p.date,"sub");printLine(p.desc);printLine("["+p.tags.join("] [")+"]","sub");printLine("");});}
+  function printProjects(){printHeader("PROJECTS","sec-proj");resume.projects.forEach(function(p){printHtml("<b>"+escapeHtml(p.name)+"</b>","k");printLine(p.date,"sub");printLine(p.desc);if(p.links)p.links.forEach(function(l){printHtml(escapeHtml(l.label)+": "+linkifyUrls(l.url),"sub");});printLine("["+p.tags.join("] [")+"]","sub");printLine("");});}
   function printSkills(){printHeader("SKILLS","sec-skills");Object.keys(resume.skills).forEach(function(g){printHtml("<b>"+escapeHtml(g)+":</b> "+escapeHtml(resume.skills[g].join(", ")),"k");});}
   function printInterests(){printHeader("INTERESTS","sec-int");printLine(resume.interests.join("  ·  "));}
   function printContact(){printHeader("CONTACT","sec-contact");printHtml("email     "+'<a href="mailto:'+resume.contact.email+'">'+escapeHtml(resume.contact.email)+"</a>","k");printHtml("phone     "+escapeHtml(resume.contact.phone),"k");printHtml("linkedin  "+'<a href="'+resume.contact.linkedin+'" target="_blank" rel="noopener">'+escapeHtml(resume.contact.linkedin)+"</a>","k");}
