@@ -1,22 +1,14 @@
-# Ise Okhiria — Portfolio
+# Ise Okhiria's Portfolio
 
-A retro "personal computer" portfolio site. You start on a Windows-XP-style
+Check it out at: [Portfolio](britneyio.github.io)
+
+A retro personal computer portfolio site. You start on a Windows-XP-style
 desktop; a **Start** button boots into a black-and-green terminal that prints
 the résumé, and a graphical desktop lets you open each section as its own window
 (plus a Snake game).
 
 Vanilla HTML/CSS/JS split across a few files — no framework, no build step for
 normal use.
-
-## Run
-
-Serve the folder (recommended, so fonts load reliably), or just open
-`index.html` in a browser:
-
-```bash
-python3 -m http.server 8000
-# then visit http://127.0.0.1:8000/
-```
 
 ## Edit content
 
