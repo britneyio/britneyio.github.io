@@ -1,6 +1,6 @@
 # Ise Okhiria's Portfolio
 
-Check it out at: [Portfolio](britneyio.github.io)
+Check it out at: [Portfolio](https://britneyio.github.io)
 
 A retro personal computer portfolio site. You start on a Windows-XP-style
 desktop; a **Start** button boots into a black-and-green terminal that prints
