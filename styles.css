@@ -1,0 +1,251 @@
+/* =====================================================================
+   styles.css — all styling for the retro "personal computer" portfolio.
+
+   Loaded directly by index.html (<link rel="stylesheet">). Edit this file
+   and refresh the browser — no build step required.
+
+   Two typefaces, loaded from the fonts/ folder as subsetted woff2:
+   'PressStart' (blocky pixel font, used for headings/chrome) and
+   'VT323' (thin terminal font, used for body copy).
+
+   (build.py is an OPTIONAL bundler that inlines this file, app.js, and these
+   fonts into a single self-contained dist/index.html. It rewrites the font
+   url()s below into base64 data URIs, so keep them as normal file paths here.)
+   ===================================================================== */
+@font-face{font-family:'PressStart';src:url("fonts/PressStart2P-Regular.ttf") format('truetype');font-display:swap;}
+@font-face{font-family:'VT323';src:url("fonts/VT323-Regular.ttf") format('truetype');font-display:swap;}
+
+/* Design tokens: every color in the theme lives here as a CSS variable so
+   the whole palette can be retuned in one place. Grouped by what they skin. */
+:root{
+  --desk:#ffd7ec;          /* pink computer screen */
+  --desk-2:#ffc2e0;
+  --desk-dot:#ff9dcb;
+
+  --face:#ecdfe7;
+  --face-hi:#fff8fc;
+  --face-lo:#9a8792;
+  --ink:#3a2231;
+  --ink-soft:#7d6472;
+
+  --pink:#ff9dcb;
+  --pink-soft:#ffc4e0;
+  --pink-deep:#e0609f;
+  --green:#1fa56d;
+  --green-led:#57ffb0;
+  --line:#c9b6c1;
+
+  /* black terminal, green text */
+  --term-bg:#000000;
+  --term-bar:#0c1c12;
+  --term-ink:#33ff66;
+  --term-dim:#1fae5a;
+  --term-inv:#33ff66;
+  --term-inv-t:#00160a;
+
+  --case:#b7a5af;
+  --case-hi:#d9cbd3;
+  --case-lo:#7f6d78;
+  --frame:#211820;
+}
+
+*{box-sizing:border-box;}
+::selection{background:var(--term-ink);color:var(--term-bg);}
+
+html,body{height:100%;}
+body{
+  margin:0;
+  background:radial-gradient(120% 100% at 50% 0%, #2a1f28, #171016 70%);
+  color:var(--ink);
+  font-family:'VT323',ui-monospace,monospace;
+  font-size:22px;line-height:1.3;letter-spacing:.3px;
+  height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  padding:20px 16px;-webkit-font-smoothing:none;
+}
+button,a,.icon,.task,.start,.cmdbtn,.mi{touch-action:manipulation;-webkit-tap-highlight-color:rgba(224,96,159,.25);}
+
+/* Classic Win95-style bevel: light top/left + dark bottom/right edges fake a
+   raised ("out") or sunken ("in") 3D border with no images. */
+.out{border:3px solid;border-top-color:var(--face-hi);border-left-color:var(--face-hi);border-right-color:var(--face-lo);border-bottom-color:var(--face-lo);}
+.in{border:3px solid;border-top-color:var(--face-lo);border-left-color:var(--face-lo);border-right-color:var(--face-hi);border-bottom-color:var(--face-hi);}
+
+/* ---- monitor case ---- */
+.monitor{
+  width:min(1160px,96vw,calc((100dvh - 116px) * 1.32));
+  background:linear-gradient(160deg,var(--case-hi),var(--case) 40%,var(--case-lo));
+  border-radius:26px 26px 18px 18px;padding:26px 26px 20px;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -6px 14px rgba(0,0,0,.35),0 30px 60px rgba(0,0,0,.55);
+}
+.nameplate{display:flex;align-items:center;justify-content:space-between;padding:0 8px 14px;}
+.nameplate .logo{font-family:'PressStart',monospace;font-size:11px;color:#5f4f59;letter-spacing:1px;text-shadow:1px 1px 0 rgba(255,255,255,.4);}
+.nameplate .led{display:flex;align-items:center;gap:9px;font-family:'PressStart',monospace;font-size:8px;color:#5f4f59;}
+.nameplate .led b{width:11px;height:11px;border-radius:50%;background:var(--green-led);box-shadow:0 0 8px var(--green-led),inset 0 0 3px #0a5;animation:pulse 2.4s ease-in-out infinite;}
+@keyframes pulse{50%{opacity:.55;}}
+
+/* ---- inner screen ---- */
+/* .desktop paints the XP-style "Bliss" wallpaper purely with CSS gradients:
+   a soft highlight, a green rolling-hill layer, then the blue sky behind. */
+.screen{background:var(--frame);border-radius:16px;padding:16px;box-shadow:inset 0 0 0 2px #000,inset 0 0 30px rgba(0,0,0,.7);}
+.desktop{
+  position:relative;aspect-ratio:4/3;overflow:hidden;border-radius:6px;isolation:isolate;
+  background:
+    radial-gradient(120% 62% at 80% 12%, rgba(255,255,255,.55), transparent 45%),
+    radial-gradient(150% 70% at 50% 128%, #a4d55a 0%, #7bbf3f 20%, #4f9c2c 40%, #2f7a24 55%, rgba(47,122,36,0) 60%),
+    linear-gradient(#1f6fc4 0%, #3f8fda 30%, #78b6e8 55%, #b8dcf3 78%, #e2f0fa 100%);
+}
+/* CRT scanline + vignette overlay drawn on top of everything on the screen. */
+.desktop::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:60;
+  background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 2px,rgba(90,40,70,.05) 3px 4px),radial-gradient(130% 120% at 50% 50%,transparent 68%,rgba(40,10,30,.28));}
+
+/* ---- desktop icons ----
+   Horizontal launcher row across the top of the screen. Low z-index (below
+   the windows at z>=10) so an open window paints OVER the icons instead of
+   them bleeding through. */
+.icons{position:absolute;top:10px;left:10px;right:10px;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;z-index:5;}
+.icon{display:flex;flex-direction:column;align-items:center;gap:3px;width:78px;padding:5px 4px;background:transparent;border:2px solid transparent;cursor:pointer;font:inherit;color:var(--ink);}
+.icon .ico{width:30px;height:30px;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.25));}
+.icon .lbl{font-size:13px;line-height:1.05;text-align:center;color:#4a2c3d;padding:1px 4px;}
+
+/* screensaver title on the pink screen — centered name + subtitle + Start */
+.saver{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;pointer-events:none;text-align:center;font-family:'PressStart',monospace;letter-spacing:2px;line-height:1.55;color:#ff4fa3;text-shadow:3px 3px 0 #fff,6px 6px 0 #ffa7d4,9px 9px 0 rgba(224,96,159,.35);}
+.saver span{font-size:clamp(24px,6.2vw,62px);}
+.saver .sub{font-family:'VT323',monospace;font-size:clamp(16px,2.4vw,24px);letter-spacing:3px;color:#e0609f;text-shadow:2px 2px 0 #fff;margin-top:10px;}
+.saver.float{animation:drift 5.5s ease-in-out infinite alternate;}
+@keyframes drift{from{transform:translateY(-7px);}to{transform:translateY(9px);}}
+.startpc{pointer-events:auto;margin-top:26px;font-family:'PressStart',monospace;font-size:clamp(11px,1.7vw,16px);color:var(--ink);background:var(--pink);padding:16px 30px;cursor:pointer;letter-spacing:2px;border:3px solid;border-top-color:var(--pink-soft);border-left-color:var(--pink-soft);border-right-color:var(--pink-deep);border-bottom-color:var(--pink-deep);box-shadow:5px 5px 0 rgba(0,0,0,.35);text-shadow:none;}
+.startpc:hover{background:var(--pink-soft);}
+.startpc:active{transform:translate(2px,2px);box-shadow:2px 2px 0 rgba(0,0,0,.35);}
+.startpc:focus-visible{outline:3px solid var(--green);outline-offset:3px;}
+.startpc::before{content:"\25B6  ";}
+.icon:hover .lbl,.icon:focus-visible .lbl{background:var(--pink);color:var(--ink);}
+.icon:focus-visible{outline:2px dotted var(--pink-deep);outline-offset:1px;}
+.icon.sel .lbl{background:var(--pink-deep);color:#fff;}
+
+/* ---- windows ---- */
+/* Draggable app windows (About, Experience, ...). JS toggles [hidden] and the
+   .active class; .wide widens the roomier sections. Below: title bar, buttons,
+   scrollable body, then the per-section content styles (xp / pj / skills). */
+.win{position:absolute;top:36px;left:150px;width:min(440px,84%);background:var(--face);z-index:10;display:flex;flex-direction:column;box-shadow:5px 6px 0 rgba(0,0,0,.35);max-height:calc(100% - 74px);}
+.win[hidden]{display:none;}
+.win.wide{width:min(580px,90%);}
+.win__bar{display:flex;align-items:center;gap:8px;padding:5px 6px 5px 8px;background:#c3b3bd;cursor:grab;user-select:none;touch-action:none;}
+.win.active .win__bar{background:linear-gradient(90deg,var(--pink),var(--pink-soft));}
+.win__bar .t{font-family:'PressStart',monospace;font-size:10px;color:#5b4b55;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.win.active .win__bar .t{color:var(--ink);}
+.win__btns{display:flex;gap:5px;}
+.win__btns button{width:22px;height:20px;padding:0;background:var(--face);font-family:'PressStart',monospace;font-size:8px;color:var(--ink);cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;}
+.win__body{padding:18px;overflow:auto;background:#fff6fb;border-top:2px solid var(--face-lo);color:var(--ink);}
+.win__body::-webkit-scrollbar{width:14px;}
+.win__body::-webkit-scrollbar-track{background:var(--face);}
+.win__body::-webkit-scrollbar-thumb{background:var(--pink);border:2px solid var(--face);}
+.win__body h2{font-family:'PressStart',monospace;font-size:13px;color:var(--pink-deep);margin:0 0 14px;text-transform:uppercase;line-height:1.4;}
+.win__body p{margin:0 0 13px;color:var(--ink);}
+.win__body p:last-child{margin-bottom:0;}
+.win__body a{color:var(--green);text-underline-offset:3px;word-break:break-word;}
+.tag-lead{font-family:'PressStart',monospace;font-size:8px;color:var(--green);text-transform:uppercase;}
+
+.xp{display:flex;flex-direction:column;gap:18px;padding:0;margin:0;}
+.xp li{list-style:none;}
+.xp__yr{font-family:'PressStart',monospace;font-size:9px;color:var(--green);font-variant-numeric:tabular-nums;}
+.xp__role{font-size:24px;color:var(--pink-deep);text-transform:uppercase;letter-spacing:.5px;}
+.xp__co{font-size:20px;color:var(--ink-soft);margin-bottom:6px;}
+.xp__pts{margin:0;padding-left:20px;}
+.xp__pts li{list-style:square;font-size:20px;margin-bottom:6px;}
+
+.pj{display:flex;flex-direction:column;gap:14px;}
+.pj article{background:#fff;padding:14px;}
+.pj h3{font-family:'PressStart',monospace;font-size:10px;color:var(--ink);margin:0 0 4px;text-transform:uppercase;}
+.pj .date{font-size:17px;color:var(--ink-soft);margin:0 0 8px;}
+.pj p{font-size:20px;margin:0 0 10px;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{font-family:'PressStart',monospace;font-size:7px;color:var(--ink-soft);border:2px solid var(--line);padding:5px 6px;text-transform:uppercase;}
+
+.skill-grp{margin-bottom:14px;}
+.skill-grp h3{font-family:'PressStart',monospace;font-size:9px;color:var(--green);margin:0 0 8px;text-transform:uppercase;}
+.badges{display:flex;flex-wrap:wrap;gap:8px;}
+.badge{font-family:'PressStart',monospace;font-size:9px;color:var(--ink);background:#fff;padding:9px 10px;box-shadow:3px 3px 0 var(--pink);}
+.badge:nth-child(2n){box-shadow:3px 3px 0 var(--green-led);}
+
+/* games */
+#w-games .win__body{overflow:hidden;padding:14px;}
+.games{display:flex;flex-direction:column;gap:9px;align-items:center;}
+.games .hint{font-size:16px;color:var(--ink-soft);text-align:center;margin:0;}
+#snake{background:#0a150e;image-rendering:pixelated;width:100%;max-width:196px;aspect-ratio:1;display:block;}
+.game-hud{display:flex;justify-content:space-between;width:100%;max-width:196px;font-family:'PressStart',monospace;font-size:8px;color:var(--pink-deep);}
+.game-btn{font-family:'PressStart',monospace;font-size:10px;color:var(--ink);background:var(--pink);padding:9px 14px;cursor:pointer;}
+.game-btn:active{transform:translate(1px,1px);}
+
+/* taskbar */
+.taskbar{position:absolute;left:0;right:0;bottom:0;z-index:70;display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--face);border-top:3px solid var(--face-hi);}
+.start{display:flex;align-items:center;gap:8px;background:var(--pink);font-family:'PressStart',monospace;font-size:10px;color:var(--ink);padding:8px 12px;cursor:pointer;}
+.start .sq{width:11px;height:11px;background:var(--frame);}
+.tasks{display:flex;gap:6px;flex:1;overflow:hidden;}
+.task{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--face);font-family:'PressStart',monospace;font-size:8px;color:var(--ink-soft);padding:8px 10px;cursor:pointer;}
+.task.on{color:var(--ink);border-top-color:var(--face-lo);border-left-color:var(--face-lo);border-right-color:var(--face-hi);border-bottom-color:var(--face-hi);background:var(--pink-soft);}
+.clock{background:var(--desk);font-family:'PressStart',monospace;font-size:9px;color:var(--ink);padding:8px 10px;font-variant-numeric:tabular-nums;}
+
+/* start menu */
+.startmenu{position:absolute;left:8px;bottom:46px;z-index:200;width:240px;background:var(--face);display:flex;box-shadow:5px -4px 0 rgba(0,0,0,.3);}
+.startmenu[hidden]{display:none;}
+.startmenu .side{width:34px;background:linear-gradient(var(--pink),var(--pink-deep));writing-mode:vertical-rl;transform:rotate(180deg);font-family:'PressStart',monospace;font-size:10px;color:#fff;display:flex;align-items:center;justify-content:center;padding:8px 0;letter-spacing:2px;}
+.startmenu .list{flex:1;padding:6px;display:flex;flex-direction:column;gap:2px;}
+.mi{display:flex;align-items:center;gap:10px;background:transparent;border:none;cursor:pointer;font-family:'VT323',monospace;font-size:20px;color:var(--ink);padding:7px 8px;text-align:left;width:100%;}
+.mi:hover,.mi:focus-visible{background:var(--pink-deep);color:#fff;outline:none;}
+.mi .ico{width:22px;height:22px;}
+.mi.div{border-top:2px solid var(--line);padding:0;margin:4px 0;height:0;pointer-events:none;}
+
+/* ===== TERMINAL (green, black text) on pink screen ===== */
+#terminal{position:absolute;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:22px;background:transparent;}
+#terminal.off{display:none;}
+.desktop.term-on .taskbar{display:none;}
+#term-window{width:min(720px,100%);height:min(86%,600px);display:flex;flex-direction:column;background:var(--term-bg);border:3px solid var(--term-ink);box-shadow:8px 8px 0 rgba(0,0,0,.45);overflow:hidden;}
+#term-bar{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--term-bar);border-bottom:2px solid var(--term-ink);}
+#term-bar .tt{font-family:'PressStart',monospace;font-size:10px;color:var(--term-ink);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#term-bar .term-x{font-family:'PressStart',monospace;font-size:9px;color:#fff;background:#e0483f;border:2px solid #7a1c16;width:26px;height:22px;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;}
+#term-bar .term-x:hover,#term-bar .term-x:focus-visible{background:#ff5a4d;outline:none;}
+#term-bar .term-x:active{transform:translate(1px,1px);}
+#term-scroll{flex:1;overflow:auto;padding:14px 16px 0;color:var(--term-ink);font-size:20px;line-height:1.28;}
+#term-scroll::-webkit-scrollbar{width:14px;}
+#term-scroll::-webkit-scrollbar-track{background:var(--term-bar);}
+#term-scroll::-webkit-scrollbar-thumb{background:var(--term-ink);border:3px solid var(--term-bg);}
+.tl{margin:0 0 3px;white-space:pre-wrap;word-break:break-word;}
+.tl.h{display:inline-block;background:var(--term-inv);color:var(--term-inv-t);font-family:'PressStart',monospace;font-size:11px;padding:6px 9px;margin:14px 0 8px;letter-spacing:1px;}
+.tl.first{margin-top:2px;}
+.tl.b{padding-left:20px;text-indent:-14px;}
+.tl.sub{color:var(--term-dim);}
+.tl.k{color:var(--term-ink);}
+.tl.k b{color:var(--term-inv);}
+#term-scroll a{color:var(--term-ink);text-decoration:underline;}
+.bigname{font-family:'PressStart',monospace;font-size:clamp(13px,3.4vw,20px);line-height:1.5;margin:2px 0 4px;color:var(--term-ink);}
+#term-cmdbar{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;background:var(--term-bar);border-top:2px solid var(--term-ink);}
+#term-cmdbar .lead{font-family:'PressStart',monospace;font-size:8px;color:var(--term-ink);align-self:center;padding:0 4px 0 2px;opacity:.85;}
+.cmdbtn{font-family:'PressStart',monospace;font-size:8px;color:var(--term-ink);background:var(--term-bg);border:2px solid var(--term-ink);padding:7px 8px;cursor:pointer;line-height:1;}
+.cmdbtn:hover,.cmdbtn:focus-visible{background:var(--term-ink);color:var(--term-bg);outline:none;}
+.cmdbtn.go{margin-left:auto;background:var(--term-ink);color:var(--term-bg);}
+.cmdbtn.go:hover{filter:brightness(1.15);}
+
+/* focus visibility (keyboard) */
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--pink-deep);outline-offset:2px;}
+#term-window button:focus-visible,.cmdbtn:focus-visible,#term-scroll:focus-visible{outline:3px solid var(--term-ink);outline-offset:2px;}
+.win__btns button:focus-visible,.start:focus-visible,.task:focus-visible{outline:3px solid var(--pink-deep);outline-offset:1px;}
+
+/* Phone layout: stack the desktop full-height, drop the 4:3 aspect ratio,
+   make windows fill the screen, and lay icons out in a row. */
+@media (max-width:640px){
+  body{padding:10px 6px;font-size:20px;}
+  .cmdbtn,.cmdbtn.go{font-size:9px;padding:9px 11px;}
+  #term-cmdbar .lead{font-size:9px;}
+  .monitor{padding:14px 12px 10px;border-radius:16px;}
+  .desktop{aspect-ratio:auto;height:calc(100dvh - 112px);}
+  .win{width:calc(100% - 20px)!important;left:10px!important;top:10px!important;max-height:calc(100% - 20px);}
+  .win.wide{width:calc(100% - 20px)!important;}
+  .icons{display:flex;flex-direction:row;flex-wrap:wrap;gap:3px;}
+  .icon{width:70px;}
+  .desktop.term-on .icons{display:none;}
+  #terminal{padding:10px;}
+  #term-window{height:calc(100% - 20px);}
+  .saver{padding-left:0;}
+  .saver span{text-shadow:2px 2px 0 #fff,4px 4px 0 #ffa7d4;}
+}
+/* Respect users who ask the OS to minimize motion: kill the ambient animations. */
+@media (prefers-reduced-motion:reduce){.nameplate .led b,.saver.float{animation:none;}}
